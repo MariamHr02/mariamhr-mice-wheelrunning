@@ -1,0 +1,34 @@
+import pandas as pd
+import datetime
+
+def sum_values_between_criteria(data_file, criteria_column_indices, value_column_index, min_criteria_date, max_criteria_date, min_criteria_time, max_criteria_time):
+    data = pd.read_csv(data_file, sep='\t', header=0)
+
+    # Convert criteria_column_indices[1] (time) to datetime.time
+    data.iloc[:, criteria_column_indices[1]] = pd.to_datetime(data.iloc[:, criteria_column_indices[1]], format='%H:%M:%S').dt.time
+
+    # Convert criteria_column_indices[0] (date) to datetime.date
+    data.iloc[:, criteria_column_indices[0]] = pd.to_datetime(data.iloc[:, criteria_column_indices[0]], format='%d/%m/%Y').dt.date
+
+    # Filter rows based on both time and date criteria
+    filtered_data = data[
+        (data.iloc[:, criteria_column_indices[1]] >= min_criteria_time) &
+        (data.iloc[:, criteria_column_indices[1]] <= max_criteria_time) &
+        (data.iloc[:, criteria_column_indices[0]] >= min_criteria_date) &
+        (data.iloc[:, criteria_column_indices[0]] <= max_criteria_date)]
+
+    # Calculate the sum of values in the value_column
+    total_sum = filtered_data.iloc[:, value_column_index].sum()
+
+    return total_sum
+
+data_file_path = 'C:\\Users\\maria\\PycharmProjects\\HelloWorld\\test_1_ir.txt'
+criteria_column_indices = [0, 1]  # Replace with column indices for criteria
+value_column_index = 3
+min_criteria_date = datetime.date(2023, 8, 6)  # Replace with min criteria date, y-d-m
+max_criteria_date = datetime.date(2023, 8, 6)  # Replace with max criteria date, y-d-m
+min_criteria_time = datetime.time(14, 15) # Replace with min criteria time, h-min
+max_criteria_time = datetime.time(15, 24) # Replace with max criteria time, h-min
+
+result = sum_values_between_criteria(data_file_path, criteria_column_indices, value_column_index, min_criteria_date, max_criteria_date, min_criteria_time, max_criteria_time)
+print(f"The sum of values between {min_criteria_time} and {max_criteria_time}, {min_criteria_date} and {max_criteria_date} is: {result}")
